@@ -23,11 +23,6 @@ namespace CpuLoad
             {
                 cpuload = cpuCounter.NextValue();
                 ramusage = ramCounter.NextValue();
-                //On attends 500ms
-                System.Threading.Thread.Sleep(500);
-
-                cpuload = cpuCounter.NextValue();
-                ramusage = ramCounter.NextValue();
 
                 cpu = Convert.ToInt16(cpuload);
                 ram = Convert.ToInt16(ramusage);
@@ -159,9 +154,11 @@ namespace CpuLoad
                     Chroma.Instance.Keyboard.SetKey(Key.D0, new ColoreColor(255, 50, 0));
                 }
                 else Chroma.Instance.Keyboard.SetKey(Key.D0, ColoreColor.White);
+
+                //On attends 500ms
+                System.Threading.Thread.Sleep(500);
+
             }
-
-
         }
     }
 }
