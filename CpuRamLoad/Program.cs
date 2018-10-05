@@ -4,235 +4,122 @@ using Corale.Colore.Core;
 using Corale.Colore.Razer.Keyboard;
 using ColoreColor = Corale.Colore.Core.Color;
 using OpenHardwareMonitor.Hardware;
+using System.Collections.Generic;
 
 namespace CpuLoad
 {
     class Program
     {
+        private static int GetGpuUsage()
+        {
+            Computer pc = new Computer();
+            pc.GPUEnabled = true;
+            pc.Open();
+            float ChargeGPU;
+            ChargeGPU = pc.Hardware[0].Sensors[5].Value.GetValueOrDefault();
+
+            return Convert.ToInt16(ChargeGPU);
+        }
+
         static void Main(string[] args)
         {
+            //On éclaire tout en Bleu
             Chroma.Instance.SetAll(ColoreColor.Blue);
-            Chroma.Instance.Keyboard.SetKey(Key.F1, ColoreColor.White);
+
+            //On définit les touches à allumer pour le GPU
+            List<Key> GpuKeys = new List<Key>();
+            GpuKeys.Add(Key.A);
+            GpuKeys.Add(Key.Z);
+            GpuKeys.Add(Key.E);
+            GpuKeys.Add(Key.R);
+            GpuKeys.Add(Key.T);
+            GpuKeys.Add(Key.Y);
+            GpuKeys.Add(Key.U);
+            GpuKeys.Add(Key.I);
+            GpuKeys.Add(Key.O);
+            GpuKeys.Add(Key.P);
+
+            //On définit les touches à allumer pour le CPU
+            List<Key> CpuKeys = new List<Key>();
+            CpuKeys.Add(Key.F1);
+            CpuKeys.Add(Key.F2);
+            CpuKeys.Add(Key.F3);
+            CpuKeys.Add(Key.F4);
+            CpuKeys.Add(Key.F5);
+            CpuKeys.Add(Key.F6);
+            CpuKeys.Add(Key.F7);
+            CpuKeys.Add(Key.F8);
+            CpuKeys.Add(Key.F9);
+            CpuKeys.Add(Key.F10);
+
+            //On définit les touches à allumer pour la RAM
+            List<Key> RamKeys = new List<Key>();
+            RamKeys.Add(Key.D1);
+            RamKeys.Add(Key.D2);
+            RamKeys.Add(Key.D3);
+            RamKeys.Add(Key.D4);
+            RamKeys.Add(Key.D5);
+            RamKeys.Add(Key.D6);
+            RamKeys.Add(Key.D7);
+            RamKeys.Add(Key.D8);
+            RamKeys.Add(Key.D9);
+            RamKeys.Add(Key.D0);
+
+            //On définit les couleurs des 10 touches utilisées du bleu au rouge
+            List<ColoreColor> Couleurs = new List<ColoreColor>();
+            Couleurs.Add(new ColoreColor(0, 0, 250));
+            Couleurs.Add(new ColoreColor(0, 100, 200));
+            Couleurs.Add(new ColoreColor(0, 150, 150));
+            Couleurs.Add(new ColoreColor(0, 200, 100));
+            Couleurs.Add(new ColoreColor(0, 250, 50));
+            Couleurs.Add(new ColoreColor(50, 250, 50));
+            Couleurs.Add(new ColoreColor(100, 200, 0));
+            Couleurs.Add(new ColoreColor(150, 100, 0));
+            Couleurs.Add(new ColoreColor(250, 50, 0));
+            Couleurs.Add(new ColoreColor(250, 0, 0));
+
+
+            //On initialise les variables pour récupérer les valeurs CPU, GPU, RAM
             PerformanceCounter cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
             PerformanceCounter ramCounter = new PerformanceCounter("Memory", "% Committed Bytes In Use");
-            float cpuload;
-            float ramusage;
-            int cpu;
-            int ram;
-            int gpu;                                                                              
+
+            float CpuLoad;
+            float RamUsage;
+            int GpuUsage;
 
             while (true)
             {
-                Computer pc = new Computer();
-                pc.GPUEnabled = true;
-                pc.Open();
-
-                float ChargeGPU;
-                //Il y a 3 unités de calcul à prendre en compte
-                ChargeGPU = pc.Hardware[0].Sensors[5].Value.GetValueOrDefault()
-                            + pc.Hardware[0].Sensors[6].Value.GetValueOrDefault() 
-                            + pc.Hardware[0].Sensors[7].Value.GetValueOrDefault();
-
-                cpuload = cpuCounter.NextValue();
-                ramusage = ramCounter.NextValue();
-
-                cpu = Convert.ToInt16(cpuload);
-                ram = Convert.ToInt16(ramusage);
-                gpu = Convert.ToInt16(ChargeGPU);
+                CpuLoad = cpuCounter.NextValue();
+                RamUsage = ramCounter.NextValue();
+                GpuUsage = GetGpuUsage();
 
                 //On affiche le tout comme un bourrin
-                if (cpu >= 9)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.F1, new ColoreColor(0, 0, 255));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.F1, ColoreColor.White);
-
-                if (cpu >= 18)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.F2, new ColoreColor(0, 50, 250));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.F2, ColoreColor.White);
-
-                if (cpu >= 27)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.F3, new ColoreColor(0, 100, 200));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.F3, ColoreColor.White);
-
-                if (cpu >= 36)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.F4, new ColoreColor(0, 150, 150));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.F4, ColoreColor.White);
-
-                if (cpu >= 45)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.F5, new ColoreColor(0, 200, 100));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.F5, ColoreColor.White);
-
-                if (cpu >= 54)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.F6, new ColoreColor(50, 255, 50));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.F6, ColoreColor.White);
-
-                if (cpu >= 63)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.F7, new ColoreColor(100, 200, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.F7, ColoreColor.White);
-
-                if (cpu >= 72)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.F8, new ColoreColor(150, 150, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.F8, ColoreColor.White);
-
-                if (cpu >= 81)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.F9, new ColoreColor(200, 100, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.F9, ColoreColor.White);
-
-                if (cpu >= 90)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.F10, new ColoreColor(250, 50, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.F10, ColoreColor.White);
-
-                if (cpu >= 99)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.F11, new ColoreColor(255, 0, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.F11, ColoreColor.White);
-
-                //On affiche la RAM
-                if (ram >= 10)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.D1, new ColoreColor(0, 0, 255));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.D1, ColoreColor.White);
-
-                if (ram >= 20)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.D2, new ColoreColor(0, 50, 250));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.D2, ColoreColor.White);
-
-                if (ram >= 30)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.D3, new ColoreColor(0, 100, 200));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.D3, ColoreColor.White);
-
-                if (ram >= 40)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.D4, new ColoreColor(0, 150, 150));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.D4, ColoreColor.White);
-
-                if (ram >= 50)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.D5, new ColoreColor(0, 200, 100));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.D5, ColoreColor.White);
-
-                if (ram >= 60)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.D6, new ColoreColor(50, 255, 50));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.D6, ColoreColor.White);
-
-                if (ram >= 70)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.D7, new ColoreColor(100, 200, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.D7, ColoreColor.White);
-
-                if (ram >= 80)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.D8, new ColoreColor(150, 150, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.D8, ColoreColor.White);
-
-                if (ram >= 90)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.D9, new ColoreColor(200, 100, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.D9, ColoreColor.White);
-
-                if (ram >= 99)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.D0, new ColoreColor(255, 50, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.D0, ColoreColor.White);
-
-                //On affiche le GPU
-                if (gpu >= 10)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.A, new ColoreColor(0, 0, 255));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.A, ColoreColor.White);
-
-                if (gpu >= 20)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.Z, new ColoreColor(0, 50, 250));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.Z, ColoreColor.White);
-
-                if (gpu >= 30)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.E, new ColoreColor(0, 100, 200));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.E, ColoreColor.White);
-
-                if (gpu >= 40)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.R, new ColoreColor(0, 150, 150));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.R, ColoreColor.White);
-
-                if (gpu >= 50)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.T, new ColoreColor(0, 200, 100));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.T, ColoreColor.White);
-
-                if (gpu >= 60)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.Y, new ColoreColor(50, 255, 50));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.Y, ColoreColor.White);
-
-                if (gpu >= 70)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.U, new ColoreColor(100, 200, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.U, ColoreColor.White);
-
-                if (gpu >= 80)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.I, new ColoreColor(150, 150, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.I, ColoreColor.White);
-
-                if (gpu >= 90)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.O, new ColoreColor(200, 100, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.O, ColoreColor.White);
-
-                if (gpu >= 99)
-                {
-                    Chroma.Instance.Keyboard.SetKey(Key.P, new ColoreColor(255, 50, 0));
-                }
-                else Chroma.Instance.Keyboard.SetKey(Key.P, ColoreColor.White);
-
-                //On attends 500ms
+                Eclairage(Convert.ToInt16(CpuLoad), CpuKeys, Couleurs);
+                Eclairage(Convert.ToInt16(RamUsage), RamKeys, Couleurs);
+                Eclairage(Convert.ToInt16(GpuUsage), GpuKeys, Couleurs);
+            
+                //On attends 100ms
                 System.Threading.Thread.Sleep(100);
-
             }
         }
+
+        private static void Eclairage(int charge, List<Key> Touches, List<ColoreColor> Couleurs)
+        {
+            int compteur = 0;
+
+            if (charge == 100) compteur = 9;
+            if (charge < 10) compteur = 1;
+            if (charge > 10 && charge < 100) compteur = (charge / 10);
+
+            for (int i=0; i<compteur; i++)
+            {
+                Chroma.Instance.Keyboard.SetKey(Touches[i], Couleurs[i]);
+            }
+            for (int i=compteur; i<=9; i++)
+            {
+                Chroma.Instance.Keyboard.SetKey(Touches[i], ColoreColor.White);
+            }
+        }
+         
     }
 }
